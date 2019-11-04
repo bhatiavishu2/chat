@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import classNames from 'classnames';
 import './assets/scss/styles.scss';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 import Chat from './pages/chat';
 import Join from './pages/join';

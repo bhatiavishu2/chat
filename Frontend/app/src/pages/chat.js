@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import io from 'socket.io-client';
-import ActiveUsers from './../components/activeUsers';
-import Messages from './../components/messages';
+import ActiveUsers from '../components/activeUsers';
+import Messages from '../components/messages';
 import moment from 'moment';
 import LoadingScreen from 'react-loading-screen';
 
@@ -38,7 +38,7 @@ class Chat extends Component {
             room: this.props.match.params.room
         }
 
-        socket = io('http://localhost:8080')
+        socket = io('http://localhost:4300')
 
         socket.emit('join', params, function (err) {
             if (err) {
@@ -50,6 +50,26 @@ class Chat extends Component {
             scopeThis.setState({
                 users
             });
+        });
+
+        socket.on('oldMessages', (data) => {
+            debugger;
+            const oldMessages = data.map(message => {
+            var formattedTime = moment(message.createdDate).format('h:mm a');
+                let newMsg = {
+                    text: message.chatMsg,
+                    from: message.msgBy,
+                    room: message.roomTitle.roomTitle,
+                    createdDate: formattedTime
+                }
+                return newMsg;
+            })
+            scopeThis.setState({
+                messages: oldMessages
+            });
+           if (data.length > 3) {
+                scopeThis.scrollToBottom();
+            }
         });
 
         socket.on('newMessage', (message) => {

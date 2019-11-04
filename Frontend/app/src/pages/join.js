@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-
+import { getRooms, createRoom } from '../util/api'
+import Room from '../components/CreateRoom';
+;
 const initialState = {
     name: '',
-    room: ''
+    room: '',
+    roomOptions: [],
 }
 
 class Join extends Component {
@@ -15,10 +18,24 @@ class Join extends Component {
         }
     }
 
+    componentDidMount() {
+       this.fetchRoom();
+    }
+
+    fetchRoom = async () => {
+        const roomData = await getRooms();
+        this.setState({roomOptions: roomData.data });
+    }
+
     clearForm() {
         this.setState({
             ...initialState
         });
+    }
+
+    createNewRoom = (data) => {
+        this.setState({roomOptions: [...this.state.roomOptions, data]});
+        createRoom(data);
     }
 
     inputUpdate(e) {
@@ -38,7 +55,7 @@ class Join extends Component {
 
     render() {
 
-        const { name } = this.state;
+        const { name, roomOptions } = this.state;
 
         return (
             <div className="joinForm">
@@ -56,9 +73,10 @@ class Join extends Component {
                         <div className="form_item">
                             <div className="form_select">
                                 <select name="room" onChange={this.inputUpdate.bind(this)}>
-                                    <option value="">Please select a group</option>
-                                    <option value="React JS">React JS</option>
-                                    <option value="Node JS">Node JS</option>
+                                    <option>Please select room first</option>
+                                    {
+                                        roomOptions.map((room, indx) => <option key={indx} value={room.roomTitle}>{room.roomTitle}</option>)
+                                    }
                                 </select>
                                 <i className="fas fa-chevron-down"></i>
                             </div>
@@ -68,12 +86,9 @@ class Join extends Component {
                         <button onClick={() => this.join()} className="btn">
                             Join
                         </button>
+                        <Room onSubmit={this.createNewRoom}/>
                     </div>
                 </div>
-
-
-
-
             </div>
         )
     }
